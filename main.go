@@ -54,8 +54,12 @@ func main() {
 	}
 
 	var count int = 0
+	q := &Question{
+		Problem: "Your problem here",
+		Answer:  "Your answer here",
+	}
 	for i := 0; i < len(data); i++ {
-		var rec *Question
+		rec := q
 		rec.Problem = data[i][0]
 		rec.Answer = data[i][1]
 
@@ -66,5 +70,6 @@ func main() {
 	}
 
 	// print the array
-	fmt.Printf("%+v\n", data)
+	fmt.Println("Number of correct answers", count)
+	fmt.Println("Number of wrong answers", len(data)-count)
 }
