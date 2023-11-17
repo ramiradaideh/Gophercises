@@ -15,6 +15,8 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
+	"flag"
 )
 
 type Question struct {
@@ -35,6 +37,15 @@ func QuestionPrompt(question string) string {
 	return strings.TrimSpace(s)
 
 }
+
+func Timer(time int){
+	if time == flag.NArg(){
+
+	}
+	flag.Int("time",time, )
+	timer2 := time.NewTimer(time.Second)
+}
+
 
 func main() {
 	// open file
