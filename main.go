@@ -24,11 +24,10 @@ type Question struct {
 	Answer  string
 }
 
-func QuestionPrompt(question string) string {
+func QuestionPrompt() string {
 	var s string
 	r := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Fprint(os.Stderr, question+" ")
 		s, _ = r.ReadString('\n')
 		if s != "" {
 			break
@@ -38,16 +37,17 @@ func QuestionPrompt(question string) string {
 
 }
 
-func Timer(time int){
-	if time == flag.NArg(){
+func Timer() int{
 
-	}
-	flag.Int("time",time, )
-	timer2 := time.NewTimer(time.Second)
+	timeptr := flag.Int("time", 30, "an int")
+	flag.Parse()
+	return *timeptr
 }
 
 
 func main() {
+
+
 	// open file
 	f, err := os.Open("problems.csv")
 	if err != nil {
@@ -69,18 +69,40 @@ func main() {
 		Problem: "Your problem here",
 		Answer:  "Your answer here",
 	}
-	for i := 0; i < len(data); i++ {
-		rec := q
-		rec.Problem = data[i][0]
-		rec.Answer = data[i][1]
+	fmt.Println("Press Enter to start the timer...")
+	QuestionPrompt() // Wait for Enter key press to start the timer
 
-		answer := QuestionPrompt(rec.Problem)
-		if rec.Answer == answer {
-			count++
+	timeValue := Timer()
+	timer := time.NewTimer(time.Duration(timeValue) * time.Second)
+
+
+	problemloop:
+	
+		for i := 0; i < len(data); i++ {
+			fmt.Printf("Problem %d: %s = ",i+1, data[i][0])
+			answerCh := make(chan string)
+			go func ()  {
+				answer := QuestionPrompt()
+				answerCh <- answer
+			}()
+
+			select {
+				case <-timer.C:
+					fmt.Printf("\nScore: %d out of %d", count, len(data))
+					break problemloop
+				case answer := <- answerCh:
+					rec := q
+					rec.Problem = data[i][0]
+					rec.Answer = data[i][1]
+					if rec.Answer == answer {
+						count++
+					}
+
+			}
 		}
-	}
+
+
 
 	// print the array
-	fmt.Println("Number of correct answers", count)
-	fmt.Println("Number of wrong answers", len(data)-count)
+	fmt.Printf("\nScore: %d out of %d", count, len(data))
 }
